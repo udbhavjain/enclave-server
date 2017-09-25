@@ -25,8 +25,7 @@ Example: java -jar Enclave.jar localhost:3306/enclave server.jks
 Note:  
 1. It is highly recommended to create a new, empty database for the server.  
 2. The dependency jars(JSON and MySQL connector) should be in the same folder as Enclave.jar.  
-3. Do not make manual changes to the database.    
-4. Ensure that the port you are using has been forwarded.   
+3. Ensure that the port you are using has been forwarded.   
 
 Licenses:    
 JSON by JSON.org    
