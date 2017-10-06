@@ -50,14 +50,9 @@ public class EnclaveServer {
     private static DateFormat DateFormatter;
     private static PreparedStatement InsertMessagesStatement;
     private static PreparedStatement GetMessageTime;
-    //private static PreparedStatement InsertUserLog;
-    //private static PreparedStatement ClearUserLog;
-    // private static PreparedStatement DropUserTable;
     private static PreparedStatement RemoveUser;
-    // private static PreparedStatement CreateUserTable;
     private static PreparedStatement CreateUserEntry;
-    // private static PreparedStatement RetrieveBackMessages;
-
+ 
 
     private class User
     {
@@ -99,17 +94,10 @@ public class EnclaveServer {
             dbStatement = dbConn.createStatement();
 
             InsertMessagesStatement = dbConn.prepareStatement("insert into messages values(?,?,?,?,?)");
-            //InsertUserLog = dbConn.prepareStatement("insert into ? values(?)");
-            //ClearUserLog = dbConn.prepareStatement("delete from ? where msgID like ?");
-            // DropUserTable = dbConn.prepareStatement("drop table ?");
             RemoveUser = dbConn.prepareStatement("delete from users where name like ?");
             CreateUserEntry = dbConn.prepareStatement("insert into users values(?,?,?)");
             GetMessageTime = dbConn.prepareStatement("select time from messages where msgID like ?");
-            // CreateUserTable = dbConn.prepareStatement("create table ?(msgID varchar(36))");
-            // RetrieveBackMessages = dbConn.prepareStatement("select messages.msgID,messages.sender," +
-            //         "messages.hash,messages.msg,messages.time from messages,?"+
-            //          "where messages.msgID=?.msgID;");
-
+            
         }catch(SQLException sqx)
         {
             //sqx.printStackTrace();
@@ -132,7 +120,6 @@ public class EnclaveServer {
 
         }catch(IOException|NumberFormatException iox)
         {
-            //iox.printStackTrace();
             System.out.println("[" + new Date() + "] Error creating server socket!");
             System.exit(103);
         }
@@ -151,7 +138,7 @@ public class EnclaveServer {
                 OutMap.get(uname).flush();
             }catch(IOException iox)
             {
-                //addUserLog(uname,UUID.fromString(message.getString(MessageID)));
+                
             }
 
         }
@@ -189,18 +176,15 @@ public class EnclaveServer {
                     {
                         UUID mID = (UUID)object;
 
-                        //System.out.println("Received confirmation for message " + mID.toString());
                         clearUserLog(mUserName,mID);
                     }
                     else {
                         String msg = (String) object;
-                        //System.out.println("Message from " + mUserName + " : " + msg);
                         if (msg.matches(logout_msg)) {
                             logoutUser(mUserName);
                         } else {
                             Date rcTime = new Date();
 
-                            //String time = String.format("%tr", rcTime);
                             String time = TimeFormatter.format(rcTime);
                             String date = DateFormatter.format(rcTime);
 
@@ -213,7 +197,6 @@ public class EnclaveServer {
                             msgObject.put(SenderHash, mUser.userHash);
 
                             addMessage(mID,rcTime,mUserName,mUser.userHash,msgObject.getString(MessageContent));
-                            //addUserLog(mUserName,mID);
 
                             sendMessage(msgObject);
 
@@ -221,13 +204,10 @@ public class EnclaveServer {
 
                     }
                 } catch(IOException | ClassNotFoundException|JSONException ex){
-                    //ex.printStackTrace();
-                    //System.out.println("Breaking read connection with: " + mUserName);
                     break;}
 
 
             }
-            //System.out.println("Stopping thread: " + Thread.currentThread().getName());
 
         }
     }
@@ -237,7 +217,6 @@ public class EnclaveServer {
     {
 
 
-        //System.out.println("Performing message table cleanup!");
 
         try {
 
@@ -263,8 +242,6 @@ public class EnclaveServer {
                     rs = GetMessageTime.executeQuery();
                     rs.first();
                     Long lowerTime = rs.getLong(1);
-                    //System.out.println("Upper time: " + upperTime);
-                    //System.out.println("Lower time: " + lowerTime);
 
                     if((upperTime - lowerTime) > LogoutTime)remList.add(uname);
 
@@ -319,13 +296,8 @@ public class EnclaveServer {
             InsertMessagesStatement.setString(5,message);
             InsertMessagesStatement.execute();
 
-            /*
-            dbStatement.execute("insert into messages values(\'" +
-                    msgID.toString() + "\'," + timestamp.getTime() + ",\'" + username
-                    + "\',\'" + hash + "\',\'" + message + "\');");*/
         } catch (SQLException sqx) {
             System.out.println("[" + new Date() + "] (201) Could not add " + msgID.toString() + " to message store!");
-            //sqx.printStackTrace();
         }
 
     }
@@ -338,7 +310,6 @@ public class EnclaveServer {
             ResultSet rs = dbm.getTables(null, null, "users", new String[]{"TABLE"});
             if (rs.first()) {
 
-                //System.out.println("Table \'users\' found!");
                 rs = dbStatement.executeQuery("select * from users");
 
                 while (rs.next()) {
@@ -352,32 +323,20 @@ public class EnclaveServer {
 
                 }
 
-                /*while (!rs.isClosed() && rs.next()) {
-
-                    try {
-                        dbStatement.execute("drop table " + rs.getString(1));
-                    }catch(SQLException clrx){}
-
-                }
-                dbStatement.execute("delete from users where name is not null;");*/
 
 
 
 
             } else {
-                //System.out.println("Creating table \'users\'.");
                 dbStatement.execute("create table users(name varchar(10),UID varchar(36),hash varchar(50))");
             }
             rs = dbm.getTables(null, null, "messages", new String[]{"TABLE"});
             if (rs.first()) {
-                //System.out.println("Table \'messages\' found!");
             } else {
-                //System.out.println("Creating table \'messages\'.");
                 dbStatement.execute("create table messages(msgID varchar(36),time long,sender varchar(10),hash varchar(44),msg varchar(400))");
 
             }
         }catch(SQLException|NoSuchAlgorithmException sqx){System.out.println("[" + new Date() + "] Error performing initialisation of tables!");
-            //sqx.printStackTrace();
             System.exit(102);}
 
     }
@@ -390,10 +349,8 @@ public class EnclaveServer {
             InsertUserLog.setString(1,messageID.toString());
             InsertUserLog.execute();
 
-            //dbStatement.execute("insert into " + username + " values(\'"+ messageID.toString()+"\');");
         } catch (SQLException sqx) {
             System.out.println("[" + new Date() + "] (202) Could not add " + messageID.toString() +" to " + username +" store!");
-            //sqx.printStackTrace();
         }
 
     }
@@ -406,9 +363,7 @@ public class EnclaveServer {
             ClearUserLog.execute();
 
 
-            //dbStatement.execute("delete from " + username + " where msgID like \'" + messageID.toString() + "\';");
         }catch(SQLException sqx){System.out.println("[" + new Date() + "] (203) Could not perform confirmation for " + messageID.toString() +"!");
-            //sqx.printStackTrace();
         }
     }
 
@@ -422,9 +377,7 @@ public class EnclaveServer {
 
             RemoveUser.setString(1,username);
             RemoveUser.execute();
-            //dbStatement.execute("delete from users where name like \'" + username + "\'");
         }catch(SQLException sqx){System.out.println("[" + new Date() + "] (204) Could not clear tables for user " +username+"!");
-            //sqx.printStackTrace();
         }
 
     }
@@ -455,7 +408,7 @@ public class EnclaveServer {
             try {
                 remUser.reader.close();
                 remUser.writer.close();
-            }catch(IOException iox){//iox.printStackTrace();
+            }catch(IOException iox){
             }
 
         }
@@ -476,7 +429,6 @@ public class EnclaveServer {
                     + " where messages.msgID=" + username + ".msgID;");
 
         }catch(SQLException sqx){System.out.println("[" + new Date() + "] (205) Could not fetch messages for user " + username + "!");
-            //sqx.printStackTrace();
         }
         return rs;
     }
@@ -489,14 +441,8 @@ public class EnclaveServer {
             CreateUserEntry.setString(2,userID.toString());
             CreateUserEntry.setString(3,userHash);
             CreateUserEntry.execute();
-            //dbStatement.execute("insert into users values(\'" +
-            //        username + "\',\'" + userID + "\',\'" + userHash + "\')");
-
-            //CreateUserTable.setNString(1,username);
-            //CreateUserTable.execute();
             dbStatement.execute("create table " + username + "(id int auto_increment,msgID varchar(36), primary key(id));");
         }catch(SQLException sqx){System.out.println("[" + new Date() + "] (206) Could not add user " + username+ "!");
-            //sqx.printStackTrace();
         }
 
     }
@@ -512,11 +458,9 @@ public class EnclaveServer {
         @Override
         public void run() {
             try {
-                //System.out.println(sock.getInetAddress());
                 ObjectInputStream oin = new ObjectInputStream(sock.getInputStream());
 
                 JSONObject logInfo = new JSONObject((String) oin.readObject());
-                //System.out.println(logInfo.toString());
                 ObjectOutputStream out = new ObjectOutputStream(sock.getOutputStream());
 
                 if (UserList.size() > 7) {
@@ -531,8 +475,6 @@ public class EnclaveServer {
 
                         UUID logID = UUID.fromString(logInfo.getString(LoginUUID));
                         String logHash = logInfo.getString(LoginHash);
-                        //byte[] hashbytes = logInfo.getString(LoginHash).getBytes();
-                        //String logHash = new String(hashbytes,"UTF-8");
 
                         if (UserList.containsKey(uname) && UserList.get(uname).userID.equals(logID)
                                 && UserList.get(uname).loginHash.equals(logHash)) {
@@ -547,7 +489,6 @@ public class EnclaveServer {
                                     exUser.writer.close();
                                 }catch(IOException iox){}
                             }
-                            //System.out.println("User " + exUser.name + " reconnecting! ");
 
                             exUser.reader = oin;
                             exUser.writer = out;
@@ -566,7 +507,6 @@ public class EnclaveServer {
                             ReadMap.put(exUser.sessionID, readThread);
 
                             OutMap.put(uname, out);
-                            //System.out.println("Active threads: " + Thread.activeCount());
 
 
                             ResultSet rs = getSyncMessages(exUser.name);
@@ -595,12 +535,7 @@ public class EnclaveServer {
 
                         } else {
 
-                            /*System.out.println("Has username: " + UserList.containsKey(uname));
-                            System.out.println("UUID match: " + UserList.get(uname).userID.equals(UUID.fromString(logInfo.getString(LoginUUID))));
-                            System.out.println("Hash match: " + UserList.get(uname).loginHash.matches(logInfo.getString(LoginHash)));
-                            System.out.println("Stored:\""+UserList.get(uname).loginHash+"\"");
-                            System.out.println("Given :\""+logInfo.getString(LoginHash)+"\"");
-                            System.out.println("Login Info mismatch. Rejecting.");*/
+                         
 
                             out.writeObject(false);
                             out.flush();
@@ -619,8 +554,6 @@ public class EnclaveServer {
                             newUser.reader = oin;
                             newUser.writer = out;
                             newUser.userID = UUID.randomUUID();
-                            //byte[] hashbytes = logInfo.getString(LoginHash).getBytes();
-                            //String logHash = new String(hashbytes,"UTF-8");
                             String logHash = logInfo.getString(LoginHash);
 
                             newUser.loginHash = logHash;
@@ -646,7 +579,6 @@ public class EnclaveServer {
                 }
             }catch(IOException | NoSuchAlgorithmException | SQLException | ClassNotFoundException| JSONException ex){
                 System.out.println("[" + new Date() + "] (301) Login error!");
-                //ex.printStackTrace();
             }
 
         }
@@ -676,7 +608,6 @@ public class EnclaveServer {
                 }catch(IOException x)
                 {
                     System.out.println("[" + new Date() + "] (104) Error binding to client!");
-                    //x.printStackTrace();
 
                 }
 
@@ -691,7 +622,6 @@ public class EnclaveServer {
 
     public static void main(String[] args) {
 
-        //System.out.println(UUID.randomUUID());
 
         if(args.length != 3)System.out.println("Usage: java -jar Enclave.jar database_address keystore_filename port_number");
         else
