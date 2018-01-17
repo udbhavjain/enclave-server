@@ -1,4 +1,5 @@
 # enclave-server
+Source: https://github.com/udbhavjain/enclave-server
 
 About:  
 The program is used to host groups for the Enclave app for Android (https://play.google.com/store/apps/details?id=com.jain.udbhav.enclave). It can host a maximum of 8 users at once. Users that have not received messages for a period of 3 continuous days are automatically kicked out. Manual kick-outs can be performed using the 'kick' command (kick user_name). Database cleanup is performed every 15 minutes. Communications between clients and servers are protected by SSL technology.  
