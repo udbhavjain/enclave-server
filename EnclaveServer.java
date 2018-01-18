@@ -97,16 +97,10 @@ public class EnclaveServer {
             dbStatement = dbConn.createStatement();
 
             InsertMessagesStatement = dbConn.prepareStatement("insert into messages values(?,?,?,?,?)");
-            //InsertUserLog = dbConn.prepareStatement("insert into ? values(?)");
-            //ClearUserLog = dbConn.prepareStatement("delete from ? where msgID like ?");
-            // DropUserTable = dbConn.prepareStatement("drop table ?");
             RemoveUser = dbConn.prepareStatement("delete from users where name like ?");
             CreateUserEntry = dbConn.prepareStatement("insert into users values(?,?,?)");
             GetMessageTime = dbConn.prepareStatement("select time from messages where msgID like ?");
-            // CreateUserTable = dbConn.prepareStatement("create table ?(msgID varchar(36))");
-            // RetrieveBackMessages = dbConn.prepareStatement("select messages.msgID,messages.sender," +
-            //         "messages.hash,messages.msg,messages.time from messages,?"+
-            //          "where messages.msgID=?.msgID;");
+            
 
         }catch(SQLException sqx)
         {
@@ -317,10 +311,7 @@ public class EnclaveServer {
             InsertMessagesStatement.setString(5,message);
             InsertMessagesStatement.execute();
 
-            /*
-            dbStatement.execute("insert into messages values(\'" +
-                    msgID.toString() + "\'," + timestamp.getTime() + ",\'" + username
-                    + "\',\'" + hash + "\',\'" + message + "\');");*/
+      
         } catch (SQLException sqx) {
             System.out.println("[" + new Date() + "] (201) Could not add " + msgID.toString() + " to message store!");
             //sqx.printStackTrace();
@@ -349,15 +340,6 @@ public class EnclaveServer {
                     UserList.put(user.name,user);
 
                 }
-
-                /*while (!rs.isClosed() && rs.next()) {
-
-                    try {
-                        dbStatement.execute("drop table " + rs.getString(1));
-                    }catch(SQLException clrx){}
-
-                }
-                dbStatement.execute("delete from users where name is not null;");*/
 
 
 
@@ -388,7 +370,6 @@ public class EnclaveServer {
             InsertUserLog.setString(1,messageID.toString());
             InsertUserLog.execute();
 
-            //dbStatement.execute("insert into " + username + " values(\'"+ messageID.toString()+"\');");
         } catch (SQLException sqx) {
             System.out.println("[" + new Date() + "] (202) Could not add " + messageID.toString() +" to " + username +" store!");
             //sqx.printStackTrace();
@@ -404,7 +385,6 @@ public class EnclaveServer {
             ClearUserLog.execute();
 
 
-            //dbStatement.execute("delete from " + username + " where msgID like \'" + messageID.toString() + "\';");
         }catch(SQLException sqx){System.out.println("[" + new Date() + "] (203) Could not perform confirmation for " + messageID.toString() +"!");
             //sqx.printStackTrace();
         }
@@ -420,7 +400,6 @@ public class EnclaveServer {
 
             RemoveUser.setString(1,username);
             RemoveUser.execute();
-            //dbStatement.execute("delete from users where name like \'" + username + "\'");
         }catch(SQLException sqx){System.out.println("[" + new Date() + "] (204) Could not clear tables for user " +username+"!");
             //sqx.printStackTrace();
         }
@@ -508,11 +487,7 @@ public class EnclaveServer {
             CreateUserEntry.setString(2,userID.toString());
             CreateUserEntry.setString(3,userHash);
             CreateUserEntry.execute();
-            //dbStatement.execute("insert into users values(\'" +
-            //        username + "\',\'" + userID + "\',\'" + userHash + "\')");
-
-            //CreateUserTable.setNString(1,username);
-            //CreateUserTable.execute();
+           
             dbStatement.execute("create table " + username + "(id int auto_increment,msgID varchar(36), primary key(id));");
         }catch(SQLException sqx){System.out.println("[" + new Date() + "] (206) Could not add user " + username+ "!");
             //sqx.printStackTrace();
